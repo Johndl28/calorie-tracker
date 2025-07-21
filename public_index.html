@@ -1,0 +1,253 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seguimiento de Calorías</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; }
+    .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    h1, h2 { color: #1f2937; }
+    h1 { text-align: center; }
+    select, input, button { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #d1d5db; border-radius: 4px; }
+    button { background-color: #3b82f6; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #2563eb; }
+    .section { margin-bottom: 20px; }
+    .progress { background: #e5e7eb; padding: 10px; border-radius: 4px; }
+    .tips { background: #f3f4f6; padding: 10px; border-radius: 4px; }
+    canvas { max-width: 100%; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+    .tab { padding: 10px; cursor: pointer; background: #e5e7eb; border-radius: 4px; }
+    .tab.active { background: #3b82f6; color: white; }
+    .error { color: red; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Seguimiento de Calorías</h1>
+
+    <div class="section">
+      <h2>Configurar Hora de Inicio</h2>
+      <input type="time" id="startTime" />
+      <p id="reminder" class="tips">Ingresa la hora de inicio para recordatorios.</p>
+    </div>
+
+    <div class="section">
+      <h2>Registrar Calorías</h2>
+      <select id="mealSelect">
+        <option value="">Selecciona una comida</option>
+        <option value="breakfast">Desayuno</option>
+        <option value="morningSnack">Merienda Mañana</option>
+        <option value="lunch">Almuerzo</option>
+        <option value="afternoonSnack">Merienda Tarde</option>
+        <option value="dinner">Cena</option>
+        <option value="optional">Opcional (Antojo)</option>
+      </select>
+      <input type="number" id="caloriesInput" placeholder="Calorías (kcal)" min="0" />
+      <button onclick="logCalories()">Registrar Calorías</button>
+      <p id="error" class="error" style="display: none;"></p>
+    </div>
+
+    <div class="section">
+      <h2>Vistas</h2>
+      <div class="tabs">
+        <div class="tab active" onclick="showView('weekly')">Semanal</div>
+        <div class="tab" onclick="showView('monthly')">Mensual</div>
+      </div>
+      <div id="weeklyView" class="progress">
+        <h2>Vista Semanal</h2>
+        <canvas id="weeklyChart"></canvas>
+        <p id="weeklySummary"></p>
+      </div>
+      <div id="monthlyView" class="progress" style="display: none;">
+        <h2>Vista Mensual</h2>
+        <p id="monthlySummary"></p>
+      </div>
+    </div>
+
+    <div class="section tips">
+      <h2>Consejos</h2>
+      <ul>
+        <li>Meta: 1800-1900 kcal/día. Ejemplo: Desayuno (~350 kcal), Merienda Mañana (~200 kcal), Almuerzo (~550 kcal), Merienda Tarde (~250 kcal), Cena (~450 kcal), Opcional (~150 kcal).</li>
+        <li>Evita gaseosas, chicles, exceso de sal, o vegetales como brócoli para no hincharte.</li>
+        <li>Prioriza verduras cocidas (calabaza, zanahoria) y frutas peladas (manzana, pera).</li>
+        <li>Bebe 2-3 litros de agua al día. Prueba manzanilla si te sientes hinchado.</li>
+        <li>Para antojos, usa frutas o 1-2 cuadrados de chocolate amargo (70% cacao).</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    let weeklyChart;
+
+    async function logCalories() {
+      const meal = document.getElementById('mealSelect').value;
+      const calories = parseInt(document.getElementById('caloriesInput').value);
+      const error = document.getElementById('error');
+      if (meal && calories > 0) {
+        const today = new Date().toLocaleDateString('es-AR');
+        try {
+          const response = await fetch('/api/calories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date: today, meal, calories })
+          });
+          if (response.ok) {
+            alert('Calorías registradas!');
+            document.getElementById('mealSelect').value = '';
+            document.getElementById('caloriesInput').value = '';
+            error.style.display = 'none';
+            updateViews();
+          } else {
+            const data = await response.json();
+            error.textContent = data.error || 'Error al registrar';
+            error.style.display = 'block';
+          }
+        } catch (err) {
+          error.textContent = 'Error de conexión. Intenta de nuevo.';
+          error.style.display = 'block';
+        }
+      } else {
+        error.textContent = 'Selecciona una comida y calorías válidas.';
+        error.style.display = 'block';
+      }
+    }
+
+    function getWeekDates() {
+      const today = new Date();
+      const monday = new Date(today);
+      monday.setDate(today.getDate() - (today.getDay() === 0 ? 6 : today.getDay() - 1));
+      return Array.from({ length: 7 }, (_, i) => {
+        const date = new Date(monday);
+        date.setDate(monday.getDate() + i);
+        return date.toLocaleDateString('es-AR');
+      });
+    }
+
+    function getMonthDates() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const days = [];
+      for (let d = firstDay; d <= lastDay; d.setDate(d.getDate() + 1)) {
+        days.push(new Date(d).toLocaleDateString('es-AR'));
+      }
+      return days;
+    }
+
+    async function updateViews() {
+      try {
+        const response = await fetch('/api/calories');
+        if (!response.ok) throw new Error('Error al obtener datos');
+        const calories = await response.json();
+
+        // Weekly View
+        const weekDates = getWeekDates();
+        const weeklyCalories = weekDates.map(date => {
+          const dayCalories = calories.filter(c => c.date === date);
+          return dayCalories.reduce((sum, c) => sum + c.calories, 0);
+        });
+        document.getElementById('weeklySummary').textContent = `Total semanal: ${weeklyCalories.reduce((sum, cal) => sum + cal, 0)} kcal (Promedio diario: ${(weeklyCalories.reduce((sum, cal) => sum + cal, 0) / 7).toFixed(0)} kcal)`;
+
+        if (weeklyChart) weeklyChart.destroy();
+        weeklyChart = new Chart(document.getElementById('weeklyChart'), {
+          type: 'bar',
+          data: {
+            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+            datasets: [{
+              label: 'Calorías diarias',
+              data: weeklyCalories,
+              backgroundColor: '#3b82f6',
+              borderColor: '#2563eb',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            scales: { y: { beginAtZero: true, title: { display: true, text: 'Calorías (kcal)' } } },
+            plugins: { legend: { display: false } }
+          }
+        });
+
+        // Monthly View
+        const monthDates = getMonthDates();
+        const monthlyCalories = monthDates.map(date => {
+          const dayCalories = calories.filter(c => c.date === date);
+          return dayCalories.reduce((sum, c) => sum + c.calories, 0);
+        });
+        const totalMonth = monthlyCalories.reduce((sum, cal) => sum + cal, 0);
+        document.getElementById('monthlySummary').textContent = `Total mensual: ${totalMonth} kcal (Promedio diario: ${(totalMonth / monthDates.length).toFixed(0)} kcal)`;
+      } catch (error) {
+        document.getElementById('error').textContent = 'Error al cargar datos. Verifica tu conexión.';
+        document.getElementById('error').style.display = 'block';
+      }
+    }
+
+    function showView(view) {
+      document.getElementById('weeklyView').style.display = view === 'weekly' ? 'block' : 'none';
+      document.getElementById('monthlyView').style.display = view === 'monthly' ? 'block' : 'none';
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelector(`.tab[onclick="showView('${view}')"]`).classList.add('active');
+    }
+
+    document.getElementById('startTime').addEventListener('change', () => {
+      localStorage.setItem('startTime', document.getElementById('startTime').value);
+      updateReminder();
+    });
+
+    function updateReminder() {
+      const startTime = localStorage.getItem('startTime');
+      if (startTime) {
+        const start = new Date(`1970-01-01T${startTime}`);
+        const now = new Date();
+        const hoursPassed = (now.getTime() - new Date(`1970-01-01T${startTime}`).getTime()) / (1000 * 60 * 60);
+        document.getElementById('reminder').textContent = hoursPassed > 4 ? 'Han pasado más de 4 horas. ¡Come algo!' : 'Estás dentro del horario de comida.';
+      }
+    }
+
+    setInterval(updateReminder, 60000);
+    updateViews();
+  </script>
+</body>
+</html>
