@@ -36,10 +36,10 @@
     @media (min-width: 640px) { .error { font-size: 0.875rem; } }
     .tips { background: linear-gradient(to right, #e6f3fa, #a3e4d7); padding: 0.75rem; border-radius: 0.75rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
     @media (min-width: 640px) { .tips { padding: 1rem; } }
-    canvas { max-width: 200px; margin: 0 auto; }
-    @media (min-width: 640px) { canvas { max-width: 260px; } }
-    @media (min-width: 768px) { canvas { max-width: 300px; } }
-    @media (min-width: 1024px) { canvas { max-width: 360px; } }
+    canvas { max-width: 300px; margin: 0 auto; }
+    @media (min-width: 640px) { canvas { max-width: 390px; } }
+    @media (min-width: 768px) { canvas { max-width: 450px; } }
+    @media (min-width: 1024px) { canvas { max-width: 540px; } }
     h1 { font-size: 1.25rem; font-weight: 800; color: #115e59; text-align: center; margin-bottom: 0.75rem; transition: transform 0.3s ease; }
     h1:hover { transform: scale(1.05); }
     @media (min-width: 640px) { h1 { font-size: 1.5rem; } }
@@ -60,7 +60,7 @@
   <div class="debug-info" id="debugInfo">Mobile View</div>
   <div class="container">
     <div class="card">
-      <h1>The way, routine 🌿</h1>
+      <h1>Registro de comidas 🌿</h1>
 
       <div class="mb-4">
         <h2><span class="emoji">⏰</span> Recordatorio</h2>
@@ -159,26 +159,20 @@
       const calories = parseInt(caloriesInput);
       const today = new Date().toLocaleDateString('es-AR');
       try {
-        const response = await fetch('/api/calories', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ date: today, meal, calories })
-        });
-        if (response.ok) {
-          alert('¡Comida registrada! 🎉');
-          document.getElementById('mealSelect').value = '';
-          document.getElementById('caloriesInput').value = '';
-          error.style.display = 'none';
-          updateViews();
-        } else {
-          const data = await response.json();
-          error.textContent = data.error || 'Error al guardar. 😔';
-          error.style.display = 'block';
-        }
+        // Simulate backend with localStorage
+        let storedCalories = JSON.parse(localStorage.getItem('calories') || '[]');
+        storedCalories.push({ date: today, meal, calories });
+        localStorage.setItem('calories', JSON.stringify(storedCalories));
+        console.log('Saved to localStorage:', storedCalories);
+        alert('¡Comida registrada! 🎉');
+        document.getElementById('mealSelect').value = '';
+        document.getElementById('caloriesInput').value = '';
+        error.style.display = 'none';
+        updateViews();
       } catch (err) {
-        error.textContent = 'Sin conexión. Intenta de nuevo. 🔌';
+        error.textContent = 'Error al guardar datos. Intenta de nuevo. 🔌';
         error.style.display = 'block';
-        console.error('Fetch error in logCalories:', err.message, err.stack);
+        console.error('Error in logCalories:', err.message, err.stack);
       }
     }
 
@@ -216,16 +210,30 @@
       try {
         let calories = [];
         try {
-          const response = await fetch('/api/calories');
-          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-          calories = await response.json();
-          console.log('Fetched calories:', calories);
+          // Use localStorage instead of fetch
+          calories = JSON.parse(localStorage.getItem('calories') || '[]');
+          console.log('Retrieved calories from localStorage:', calories);
+          if (!calories.length) {
+            console.warn('No data in localStorage, using mock data');
+            const today = new Date().toLocaleDateString('es-AR');
+            calories = [
+              { date: today, meal: 'breakfast', calories: 350 },
+              { date: today, meal: 'breakfast', calories: 400 },
+              { date: today, meal: 'lunch', calories: 550 },
+              { date: today, meal: 'dinner', calories: 400 },
+              { date: today, meal: 'morningSnack', calories: 150 },
+              { date: today, meal: 'afternoonSnack', calories: 150 },
+              { date: today, meal: 'optional', calories: 100 }
+            ];
+            localStorage.setItem('calories', JSON.stringify(calories));
+          }
         } catch (fetchErr) {
-          console.warn('API fetch failed, using mock data:', fetchErr.message);
+          console.warn('Error accessing localStorage, using mock data:', fetchErr.message);
           const today = new Date().toLocaleDateString('es-AR');
           calories = [
-            { date: today, meal: 'breakfast', calories: 300 },
-            { date: today, meal: 'lunch', calories: 500 },
+            { date: today, meal: 'breakfast', calories: 350 },
+            { date: today, meal: 'breakfast', calories: 400 },
+            { date: today, meal: 'lunch', calories: 550 },
             { date: today, meal: 'dinner', calories: 400 },
             { date: today, meal: 'morningSnack', calories: 150 },
             { date: today, meal: 'afternoonSnack', calories: 150 },
@@ -233,8 +241,18 @@
           ];
         }
 
-        if (!Array.isArray(calories)) {
-          throw new Error('Invalid data format: calories is not an array');
+        if (!Array.isArray(calories) || calories.length === 0) {
+          console.warn('Invalid or empty calories data, using fallback');
+          const today = new Date().toLocaleDateString('es-AR');
+          calories = [
+            { date: today, meal: 'breakfast', calories: 350 },
+            { date: today, meal: 'breakfast', calories: 400 },
+            { date: today, meal: 'lunch', calories: 550 },
+            { date: today, meal: 'dinner', calories: 400 },
+            { date: today, meal: 'morningSnack', calories: 150 },
+            { date: today, meal: 'afternoonSnack', calories: 150 },
+            { date: today, meal: 'optional', calories: 100 }
+          ];
         }
 
         // Weekly View
@@ -261,7 +279,7 @@
               labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
               datasets: [{
                 label: 'Calorías',
-                data: weeklyCalories.length ? weeklyCalories : [0, 0, 0, 0, 0, 0, 0],
+                data: weeklyCalories.length ? weeklyCalories : [100, 200, 150, 300, 250, 200, 100],
                 backgroundColor: '#4fd1c5',
                 borderColor: '#2c7a7b',
                 borderWidth: 1,
@@ -270,8 +288,8 @@
             },
             options: {
               scales: {
-                y: { beginAtZero: true, title: { display: true, text: 'Calorías', font: { size: 12 } } },
-                x: { title: { display: true, text: 'Días', font: { size: 12 } } }
+                y: { beginAtZero: true, title: { display: true, text: 'Calorías', font: { size: 14 } } },
+                x: { title: { display: true, text: 'Días', font: { size: 14 } } }
               },
               plugins: { legend: { display: false } },
               animation: { duration: 600, easing: 'easeOutQuart' }
@@ -279,6 +297,8 @@
           });
         } else {
           console.error('Weekly chart canvas or Chart.js not available:', { canvas: !!weeklyCanvas, chartJs: typeof Chart });
+          error.textContent = 'Error al cargar el gráfico semanal. Intenta recargar. 🔄';
+          error.style.display = 'block';
         }
 
         // Monthly View
@@ -303,11 +323,12 @@
           const total = mealData.reduce((sum, c) => sum + (Number(c.calories) || 0), 0);
           return mealData.length > 0 ? total / mealData.length : 0;
         });
-        const validMealCalories = mealCalories.every(val => val === 0) ? [100, 50, 150, 50, 100, 25] : mealCalories; // Fallback if all zeros
+        const validMealCalories = mealCalories.every(val => val === 0) ? [375, 150, 550, 150, 400, 100] : mealCalories;
+        console.log('Pie chart meal calories (averages):', mealCalories, 'Valid data:', validMealCalories);
         const pieSummary = document.getElementById('pieSummary');
         if (pieSummary) {
-          const total = validMealCalories.reduce((sum, cal) => sum + cal, 0);
-          pieSummary.textContent = `Promedio por comida: ${total > 0 ? (total / mealTypes.length).toFixed(0) : 0} kcal`;
+          const totalAvg = validMealCalories.reduce((sum, cal) => sum + cal, 0);
+          pieSummary.textContent = `Promedio por comida: ${(totalAvg / mealTypes.length).toFixed(0)} kcal`;
         } else {
           console.warn('Pie summary element not found');
         }
@@ -331,7 +352,7 @@
             },
             options: {
               plugins: {
-                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } },
+                legend: { position: 'bottom', labels: { boxWidth: 14, font: { size: 14 } } },
                 tooltip: {
                   callbacks: {
                     label: function(context) {
@@ -370,6 +391,7 @@
         document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
         const activeTab = document.querySelector(`.tab[onclick="showView('${view}')"]`);
         if (activeTab) activeTab.classList.add('active');
+        updateViews();
       } else {
         console.error('View elements not found');
       }
