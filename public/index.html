@@ -42,7 +42,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Seguimiento de Calorías</title>
+  <title>Registro diario</title>
   <style>
     body { font-family: Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; }
     .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -64,16 +64,16 @@
 </head>
 <body>
   <div class="container">
-    <h1>Seguimiento de Calorías</h1>
+    <h1>Registro diario</h1>
 
     <div class="section">
-      <h2>Configurar Hora de Inicio</h2>
+      <h2>Hora de Inicio</h2>
       <input type="time" id="startTime" />
       <p id="reminder" class="tips">Ingresa la hora de inicio para recordatorios.</p>
     </div>
 
     <div class="section">
-      <h2>Registrar Calorías</h2>
+      <h2>Registrar consumos</h2>
       <select id="mealSelect">
         <option value="">Selecciona una comida</option>
         <option value="breakfast">Desayuno</option>
@@ -109,9 +109,16 @@
       <h2>Consejos</h2>
       <ul>
         <li>Meta: 1500-1600 kcal/día. Ejemplo: Desayuno (~350 kcal), Merienda Mañana (~150 kcal), Almuerzo (~550 kcal), Merienda Tarde (~200 kcal), Cena (~400 kcal), Opcional (~150 kcal).</li>
-        <li>Prioriza verduras cocidas (calabaza, zanahoria) y frutas peladas (manzana, pera).</li>
         <li>Bebe 2-3 litros de agua al día.</li>
-        <li>Para antojos, usa frutas o 1-2 cuadrados de chocolate amargo (70% cacao) 100 kcal aprox.</li>
+        <li>Para antojos, usa frutas o 1-2 cuadrados de chocolate amargo (70% cacao) 100 kcal aprox.</li><br>
+        <li>Equivalencias (cada 100gr)<br><br>
+          Pollo= 150kcal<br>
+          Pata y muslo= 120kcal<br>
+          Carne= 200kcal<br>
+          Manzana= 52kcal<br>
+          Banana= 90kcal<br>
+          Pera= 57kcal<br>
+        </li>
       </ul>
     </div>
   </div>
