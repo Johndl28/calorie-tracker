@@ -4,44 +4,74 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fitia-Inspired Calorie Tracker 🌿</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css?v=2.2.19" rel="stylesheet" onerror="document.getElementById('fallback-style').innerHTML = 'body { font-family: Arial, sans-serif; background: #e6f3fa; } .container { max-width: 95%; margin: auto; } .card { background: white; padding: 10px; margin-bottom: 10px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }';">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css?v=2.2.19" rel="stylesheet" onerror="document.getElementById('fallback-style').innerHTML = 'body { font-family: Arial, sans-serif; background: linear-gradient(to bottom, #d1e7f5, #81d4c3); } .container { max-width: 95%; margin: auto; } .card { background: white; padding: 12px; margin-bottom: 12px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); } .btn-primary { background: linear-gradient(to right, #0d9488, #2563eb); color: white; padding: 10px; border-radius: 12px; } .input-field, select { width: 100%; padding: 10px; border: 2px solid #14b8a6; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); } h1, h2 { font-weight: bold; color: #115e59; text-align: center; }';">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js?v=4.4.4"></script>
   <style id="fallback-style"></style>
   <style>
-    body { background: linear-gradient(to bottom, #d1e7f5, #81d4c3); }
-    .container { @apply max-w-[95%] sm:max-w-[640px] md:max-w-[768px] lg:max-w-[896px] mx-auto px-2 sm:px-4 py-4; }
-    .card { @apply bg-white rounded-xl shadow-md p-3 sm:p-5 mb-5 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-lg; }
-    .btn-primary { @apply bg-gradient-to-r from-teal-600 to-blue-600 text-white font-semibold rounded-xl px-4 sm:px-5 py-2.5 hover:from-teal-700 hover:to-blue-700 focus:ring-2 focus:ring-teal-400 transition-all duration-200 flex items-center justify-center gap-1.5 text-sm sm:text-base; }
-    .tab { @apply px-2 sm:px-3 py-1.5 rounded-lg font-semibold text-gray-700 cursor-pointer bg-teal-50 hover:bg-teal-100 transition-all duration-200 text-xs sm:text-sm; }
-    .tab.active { @apply bg-teal-600 text-white; }
-    .input-field { @apply w-full p-2.5 sm:p-3 bg-white border-2 border-teal-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 shadow-sm hover:shadow-lg transition-all duration-300 text-sm sm:text-base; }
-    .select-wrapper { @apply relative; }
-    .select-wrapper select { @apply appearance-none w-full p-2.5 sm:p-3 bg-white border-2 border-teal-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 shadow-sm hover:shadow-lg transition-all duration-300 text-sm sm:text-base pr-10; }
-    .select-wrapper::after { content: '▼'; @apply absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-600 text-sm sm:text-base pointer-events-none; }
-    .error { @apply text-red-600 text-xs sm:text-sm mt-1.5 font-medium; }
-    .tips { @apply bg-gradient-to-r from-teal-50 to-blue-50 p-3 sm:p-4 rounded-xl shadow-sm; }
-    canvas { @apply mx-auto max-w-[160px] sm:max-w-[200px] md:max-w-[240px] lg:max-w-[280px]; }
-    h1 { @apply text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-teal-900 mb-3 text-center transform transition-all duration-300 hover:scale-105 tracking-tight; }
-    h2 { @apply text-sm sm:text-base md:text-lg font-bold text-teal-800 mb-2.5 flex items-center gap-1.5; }
-    .summary { @apply text-gray-700 text-xs sm:text-sm mt-2 text-center; }
-    .emoji { @apply text-sm sm:text-base md:text-lg; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(to bottom, #d1e7f5, #81d4c3); }
+    .container { max-width: 95%; margin: 0 auto; padding: 0.5rem; }
+    @media (min-width: 640px) { .container { max-width: 640px; padding: 1rem; } }
+    @media (min-width: 768px) { .container { max-width: 768px; } }
+    @media (min-width: 1024px) { .container { max-width: 896px; } }
+    .card { background: white; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 0.75rem; margin-bottom: 1.25rem; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .card:hover { transform: translateY(-0.25rem); box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+    .btn-primary { background: linear-gradient(to right, #0d9488, #2563eb); color: white; font-weight: 600; border-radius: 1rem; padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: background 0.3s ease, transform 0.2s ease; }
+    .btn-primary:hover { background: linear-gradient(to right, #0f766e, #1d4ed8); transform: scale(1.02); }
+    .btn-primary:focus { outline: none; box-shadow: 0 0 0 3px rgba(20,184,166,0.4); }
+    .tab { padding: 0.5rem 1rem; border-radius: 0.75rem; font-weight: 600; color: #374151; background: #e6f3fa; cursor: pointer; transition: all 0.2s ease; font-size: 0.75rem; }
+    .tab:hover { background: #d1e7f5; }
+    .tab.active { background: #0d9488; color: white; }
+    @media (min-width: 640px) { .tab { padding: 0.5rem 1.25rem; font-size: 0.875rem; } }
+    .input-field { width: 100%; padding: 0.75rem; background: white; border: 2px solid #14b8a6; border-radius: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); font-size: 0.875rem; transition: all 0.3s ease; }
+    .input-field:focus { outline: none; border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13,148,136,0.3); }
+    .input-field:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+    .select-wrapper { position: relative; }
+    .select-wrapper select { appearance: none; width: 100%; padding: 0.75rem 2.5rem 0.75rem 0.75rem; background: white; border: 2px solid #14b8a6; border-radius: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); font-size: 0.875rem; transition: all 0.3s ease; }
+    .select-wrapper select:focus { outline: none; border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13,148,136,0.3); }
+    .select-wrapper select:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+    .select-wrapper::after { content: '▼'; position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); color: #0d9488; font-size: 0.875rem; pointer-events: none; }
+    @media (min-width: 640px) { .input-field, .select-wrapper select { padding: 0.875rem; font-size: 1rem; } .select-wrapper select { padding-right: 2.75rem; } .select-wrapper::after { right: 1rem; font-size: 1rem; } }
+    .error { color: #dc2626; font-size: 0.75rem; margin-top: 0.5rem; font-weight: 500; }
+    @media (min-width: 640px) { .error { font-size: 0.875rem; } }
+    .tips { background: linear-gradient(to right, #e6f3fa, #a3e4d7); padding: 0.75rem; border-radius: 0.75rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    @media (min-width: 640px) { .tips { padding: 1rem; } }
+    canvas { max-width: 140px; margin: 0 auto; }
+    @media (min-width: 640px) { canvas { max-width: 180px; } }
+    @media (min-width: 768px) { canvas { max-width: 220px; } }
+    @media (min-width: 1024px) { canvas { max-width: 260px; } }
+    h1 { font-size: 1.25rem; font-weight: 800; color: #115e59; text-align: center; margin-bottom: 0.75rem; transition: transform 0.3s ease; }
+    h1:hover { transform: scale(1.05); }
+    @media (min-width: 640px) { h1 { font-size: 1.5rem; } }
+    @media (min-width: 768px) { h1 { font-size: 1.875rem; } }
+    @media (min-width: 1024px) { h1 { font-size: 2.25rem; } }
+    h2 { font-size: 0.875rem; font-weight: 700; color: #0d9488; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+    @media (min-width: 640px) { h2 { font-size: 1.125rem; } }
+    @media (min-width: 768px) { h2 { font-size: 1.25rem; } }
+    .summary { color: #374151; font-size: 0.75rem; margin-top: 0.5rem; text-align: center; }
+    @media (min-width: 640px) { .summary { font-size: 0.875rem; } }
+    .emoji { font-size: 0.875rem; }
+    @media (min-width: 640px) { .emoji { font-size: 1rem; } }
+    @media (min-width: 768px) { .emoji { font-size: 1.125rem; } }
+    .debug-info { position: fixed; top: 0.5rem; right: 0.5rem; background: rgba(0,0,0,0.7); color: white; padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 0.25rem; }
   </style>
 </head>
 <body>
+  <div class="debug-info" id="debugInfo">Mobile View</div>
   <div class="container">
     <div class="card">
       <h1>Tu Camino Saludable 🌿</h1>
 
-      <div class="mb-4 sm:mb-5">
+      <div class="mb-4">
         <h2><span class="emoji">⏰</span> Recordatorio</h2>
         <input type="time" id="startTime" class="input-field" />
-        <p id="reminder" class="tips mt-1.5 text-gray-600 text-xs sm:text-sm">Configura un recordatorio para tus comidas. 📅</p>
+        <p id="reminder" class="tips mt-2 text-gray-600">Configura un recordatorio para tus comidas. 📅</p>
       </div>
 
-      <div class="mb-4 sm:mb-5">
+      <div class="mb-4">
         <h2><span class="emoji">🍎</span> Registrar Comida</h2>
         <div class="select-wrapper">
-          <select id="mealSelect" class="input-field mb-2 sm:mb-3">
+          <select id="mealSelect" class="input-field mb-3">
             <option value="">Elige una comida</option>
             <option value="breakfast">Desayuno ☕</option>
             <option value="morningSnack">Merienda Mañana 🥐</option>
@@ -51,14 +81,14 @@
             <option value="optional">Antojo 🍫</option>
           </select>
         </div>
-        <input type="number" id="caloriesInput" placeholder="Calorías (kcal)" min="0" class="input-field mb-2 sm:mb-3" />
+        <input type="number" id="caloriesInput" placeholder="Calorías (kcal)" min="0" class="input-field mb-3" />
         <button onclick="logCalories()" class="btn-primary w-full"><span class="emoji">✅</span> Guardar</button>
         <p id="error" class="error" style="display: none;"></p>
       </div>
 
-      <div class="mb-4 sm:mb-5">
+      <div class="mb-4">
         <h2><span class="emoji">📈</span> Progreso</h2>
-        <div class="flex gap-1 sm:gap-2 mb-3 sm:mb-4 flex-wrap">
+        <div class="flex gap-2 mb-4 flex-wrap">
           <div class="tab active" onclick="showView('weekly')">Semanal 📅</div>
           <div class="tab" onclick="showView('monthly')">Mensual 🗓️</div>
           <div class="tab" onclick="showView('pie')">Distribución 🥧</div>
@@ -94,6 +124,23 @@
   <script>
     let weeklyChart;
     let pieChart;
+
+    // Update debug info based on screen size
+    function updateDebugInfo() {
+      const debugInfo = document.getElementById('debugInfo');
+      if (!debugInfo) return;
+      const width = window.innerWidth;
+      if (width >= 1024) {
+        debugInfo.textContent = 'Desktop View (1024px+)';
+      } else if (width >= 768) {
+        debugInfo.textContent = 'Tablet View (768px-1023px)';
+      } else if (width >= 640) {
+        debugInfo.textContent = 'Small Tablet View (640px-767px)';
+      } else {
+        debugInfo.textContent = 'Mobile View (<640px)';
+      }
+      console.log('CSS loaded, current view:', debugInfo.textContent);
+    }
 
     async function logCalories() {
       console.log('Attempting to log calories...');
@@ -339,6 +386,8 @@
 
     window.onload = function() {
       console.log('Page loaded, initializing...');
+      updateDebugInfo();
+      window.addEventListener('resize', updateDebugInfo);
       const weeklyView = document.getElementById('weeklyView');
       if (weeklyView) {
         updateViews();
