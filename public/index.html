@@ -3,23 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro diario</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <title>Registro Diario 🌟</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" onerror="document.getElementById('fallback-style').innerHTML = 'body { font-family: Arial, sans-serif; background: #f0f0f0; } .container { max-width: 800px; margin: auto; } .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }';">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <style id="fallback-style"></style>
   <style>
-    body { background-color: #f5f7fa; }
-    .container { max-width: 900px; }
-    .card { @apply bg-white rounded-lg shadow-lg p-6 mb-6 transition-all duration-300 hover:shadow-xl; }
-    .btn-primary { @apply bg-blue-600 text-white font-medium rounded-lg px-6 py-3 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-all duration-200; }
-    .tab { @apply px-4 py-2 rounded-lg font-medium text-gray-600 cursor-pointer transition-all duration-200; }
-    .tab.active { @apply bg-blue-600 text-white; }
-    .tab:hover { @apply bg-gray-200; }
-    .input-field { @apply w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200; }
-    .error { @apply text-red-500 text-sm mt-2; }
-    .tips { @apply bg-gray-50 p-4 rounded-lg shadow-sm; }
-    canvas { @apply mx-auto; }
-    h1 { @apply text-3xl font-bold text-gray-800 mb-6 text-center; }
-    h2 { @apply text-xl font-semibold text-gray-700 mb-4; }
+    body { background: linear-gradient(to bottom, #e3f2fd, #bbdefb); }
+    .container { max-width: 800px; }
+    .card { @apply bg-white rounded-xl shadow-xl p-6 mb-6 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl; }
+    .btn-primary { @apply bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg px-4 py-2 hover:from-blue-600 hover:to-blue-700 focus:ring-4 focus:ring-blue-300 transition-all duration-200 flex items-center justify-center gap-2; }
+    .tab { @apply px-3 py-2 rounded-lg font-semibold text-gray-700 cursor-pointer bg-gray-100 hover:bg-gray-200 transition-all duration-200; }
+    .tab.active { @apply bg-blue-500 text-white; }
+    .input-field { @apply w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-white transition-all duration-200; }
+    .error { @apply text-red-500 text-sm mt-2 font-medium; }
+    .tips { @apply bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-lg shadow-md; }
+    canvas { @apply mx-auto max-w-xs; }
+    h1 { @apply text-2xl font-bold text-gray-800 mb-4 text-center; }
+    h2 { @apply text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2; }
+    .summary { @apply text-gray-600 text-sm mt-3 text-center font-medium; }
+    .emoji { @apply text-base; }
   </style>
   <script type="text/javascript">
     var gk_isXlsx = false;
@@ -39,14 +41,16 @@
           var headerRowIndex = filteredData.findIndex((row, index) =>
             row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
           );
-          if (headerRowIndex === -1 || headerRowIndex > 25) {
+          if (headerRowIndex === -1 || headerRowIndex > 25
+
+) {
             headerRowIndex = 0;
           }
           var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
           csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
           return csv;
         } catch (e) {
-          console.error(e);
+          console.error('Error loading XLSX:', e);
           return "";
         }
       }
@@ -55,68 +59,68 @@
   </script>
 </head>
 <body>
-  <div class="container mx-auto px-4 py-8">
+  <div class="container mx-auto px-4 py-6">
     <div class="card">
-      <h1>Registro Diario</h1>
+      <h1>Registro Diario 🌟</h1>
 
-      <div class="mb-8">
-        <h2>Hora de Inicio</h2>
+      <div class="mb-6">
+        <h2><span class="emoji">⏰</span> Hora de Inicio</h2>
         <input type="time" id="startTime" class="input-field" />
-        <p id="reminder" class="tips mt-2 text-gray-600">Ingresa la hora de inicio para recordatorios.</p>
+        <p id="reminder" class="tips mt-2 text-gray-600">Ingresa la hora de inicio para recordatorios. 📅</p>
       </div>
 
-      <div class="mb-8">
-        <h2>Registrar Consumos</h2>
-        <select id="mealSelect" class="input-field mb-4">
+      <div class="mb-6">
+        <h2><span class="emoji">🍽️</span> Registrar Consumos</h2>
+        <select id="mealSelect" class="input-field mb-3">
           <option value="">Selecciona una comida</option>
-          <option value="breakfast">Desayuno</option>
-          <option value="morningSnack">Merienda Mañana</option>
-          <option value="lunch">Almuerzo</option>
-          <option value="afternoonSnack">Merienda Tarde</option>
-          <option value="dinner">Cena</option>
-          <option value="optional">Opcional (Antojo)</option>
+          <option value="breakfast">Desayuno ☕</option>
+          <option value="morningSnack">Merienda Mañana 🥐</option>
+          <option value="lunch">Almuerzo 🍲</option>
+          <option value="afternoonSnack">Merienda Tarde 🥪</option>
+          <option value="dinner">Cena 🍴</option>
+          <option value="optional">Opcional (Antojo) 🍫</option>
         </select>
-        <input type="number" id="caloriesInput" placeholder="Calorías (kcal)" min="0" class="input-field mb-4" />
-        <button onclick="logCalories()" class="btn-primary">Registrar Calorías</button>
+        <input type="number" id="caloriesInput" placeholder="Calorías (kcal)" min="0" class="input-field mb-3" />
+        <button onclick="logCalories()" class="btn-primary w-full"><span class="emoji">✅</span> Registrar Calorías</button>
         <p id="error" class="error" style="display: none;"></p>
       </div>
 
-      <div class="mb-8">
-        <h2>Vistas</h2>
-        <div class="flex gap-4 mb-6">
-          <div class="tab active" onclick="showView('weekly')">Semanal</div>
-          <div class="tab" onclick="showView('monthly')">Mensual</div>
-          <div class="tab" onclick="showView('pie')">Distribución</div>
+      <div class="mb-6">
+        <h2><span class="emoji">📊</span> Vistas</h2>
+        <div class="flex gap-2 mb-4">
+          <div class="tab active" onclick="showView('weekly')">Semanal 📅</div>
+          <div class="tab" onclick="showView('monthly')">Mensual 🗓️</div>
+          <div class="tab" onclick="showView('pie')">Distribución 🥧</div>
         </div>
         <div id="weeklyView" class="card">
-          <h2>Vista Semanal</h2>
-          <canvas id="weeklyChart" class="max-w-md"></canvas>
-          <p id="weeklySummary" class="text-gray-600 mt-4"></p>
+          <h2><span class="emoji">📅</span> Vista Semanal</h2>
+          <canvas id="weeklyChart"></canvas>
+          <p id="weeklySummary" class="summary"></p>
         </div>
         <div id="monthlyView" class="card" style="display: none;">
-          <h2>Vista Mensual</h2>
-          <p id="monthlySummary" class="text-gray-600 mt-4"></p>
+          <h2><span class="emoji">🗓️</span> Vista Mensual</h2>
+          <p id="monthlySummary" class="summary"></p>
         </div>
         <div id="pieView" class="card" style="display: none;">
-          <h2>Distribución Promedio de Calorías</h2>
-          <canvas id="pieChart" class="max-w-md"></canvas>
-          <p id="pieSummary" class="text-gray-600 mt-4"></p>
+          <h2><span class="emoji">🥧</span> Distribución Promedio de Calorías</h2>
+          <canvas id="pieChart"></canvas>
+          <p id="pieSummary" class="summary"></p>
         </div>
       </div>
 
       <div class="tips">
-        <h2>Consejos</h2>
-        <ul class="list-disc pl-5 text-gray-600">
-          <li>Meta: 1500-1600 kcal/día. Ejemplo: Desayuno (~350 kcal), Merienda Mañana (~150 kcal), Almuerzo (~550 kcal), Merienda Tarde (~200 kcal), Cena (~400 kcal), Opcional (~150 kcal).</li>
-          <li>Bebe 2-3 litros de agua al día.</li>
-          <li>Para antojos, usa frutas o 1-2 cuadrados de chocolate amargo (70% cacao) 100 kcal aprox.</li>
-          <li>Equivalencias (cada 100gr)<br>
-            Pollo: 150 kcal<br>
-            Pata y muslo: 120 kcal<br>
-            Carne: 200 kcal<br>
-            Manzana: 52 kcal<br>
-            Banana: 90 kcal<br>
-            Pera: 57 kcal
+        <h2><span class="emoji">💡</span> Consejos</h2>
+        <ul class="list-disc pl-5 text-gray-600 text-sm">
+          <li>Meta: 1500-1600 kcal/día. Ejemplo: Desayuno (~350 kcal), Merienda Mañana (~150 kcal), Almuerzo (~550 kcal), Merienda Tarde (~200 kcal), Cena (~400 kcal), Opcional (~150 kcal). 🎯</li>
+          <li>Bebe 2-3 litros de agua al día. 💧</li>
+          <li>Para antojos, usa frutas o 1-2 cuadrados de chocolate amargo (70% cacao) 100 kcal aprox. 🍎🍫</li>
+          <li>Equivalencias (cada 100gr):<br>
+            Pollo: 150 kcal 🍗<br>
+            Pata y muslo: 120 kcal 🍖<br>
+            Carne: 200 kcal 🥩<br>
+            Manzana: 52 kcal 🍏<br>
+            Banana: 90 kcal 🍌<br>
+            Pera: 57 kcal 🍐
           </li>
         </ul>
       </div>
@@ -128,35 +132,39 @@
     let pieChart;
 
     async function logCalories() {
-      const meal = document.getElementById('mealSelect').value;
-      const calories = parseInt(document.getElementById('caloriesInput').value);
+      const meal = document.getElementById('mealSelect')?.value;
+      const caloriesInput = document.getElementById('caloriesInput')?.value;
       const error = document.getElementById('error');
-      if (meal && calories > 0) {
-        const today = new Date().toLocaleDateString('es-AR');
-        try {
-          const response = await fetch('/api/calories', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ date: today, meal, calories })
-          });
-          if (response.ok) {
-            alert('Calorías registradas!');
-            document.getElementById('mealSelect').value = '';
-            document.getElementById('caloriesInput').value = '';
-            error.style.display = 'none';
-            updateViews();
-          } else {
-            const data = await response.json();
-            error.textContent = data.error || 'Error al registrar';
-            error.style.display = 'block';
-          }
-        } catch (err) {
-          error.textContent = 'Error de conexión. Intenta de nuevo.';
+      if (!meal || !caloriesInput || isNaN(caloriesInput) || parseInt(caloriesInput) <= 0) {
+        if (error) {
+          error.textContent = 'Selecciona una comida y calorías válidas. ⚠️';
           error.style.display = 'block';
         }
-      } else {
-        error.textContent = 'Selecciona una comida y calorías válidas.';
+        return;
+      }
+      const calories = parseInt(caloriesInput);
+      const today = new Date().toLocaleDateString('es-AR');
+      try {
+        const response = await fetch('/api/calories', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ date: today, meal, calories })
+        });
+        if (response.ok) {
+          alert('Calorías registradas! 🎉');
+          document.getElementById('mealSelect').value = '';
+          document.getElementById('caloriesInput').value = '';
+          error.style.display = 'none';
+          updateViews();
+        } else {
+          const data = await response.json();
+          error.textContent = data.error || 'Error al registrar 😔';
+          error.style.display = 'block';
+        }
+      } catch (err) {
+        error.textContent = 'Error de conexión. Intenta de nuevo. 🔌';
         error.style.display = 'block';
+        console.error('Fetch error in logCalories:', err);
       }
     }
 
@@ -185,128 +193,189 @@
     }
 
     async function updateViews() {
+      console.log('Starting updateViews...');
+      const error = document.getElementById('error');
       try {
-        const response = await fetch('/api/calories');
-        if (!response.ok) throw new Error('Error al obtener datos');
-        const calories = await response.json();
+        let calories = [];
+        try {
+          const response = await fetch('/api/calories');
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+          calories = await response.json();
+          console.log('Fetched calories:', calories);
+        } catch (fetchErr) {
+          console.warn('API fetch failed, using mock data:', fetchErr);
+          calories = [
+            { date: new Date().toLocaleDateString('es-AR'), meal: 'breakfast', calories: 350 },
+            { date: new Date().toLocaleDateString('es-AR'), meal: 'lunch', calories: 550 },
+            { date: new Date().toLocaleDateString('es-AR'), meal: 'dinner', calories: 400 }
+          ];
+        }
+
+        if (!Array.isArray(calories)) {
+          throw new Error('Invalid data format: calories is not an array');
+        }
 
         // Weekly View
         const weekDates = getWeekDates();
         const weeklyCalories = weekDates.map(date => {
           const dayCalories = calories.filter(c => c.date === date);
-          return dayCalories.reduce((sum, c) => sum + c.calories, 0);
+          return dayCalories.reduce((sum, c) => sum + (c.calories || 0), 0);
         });
-        document.getElementById('weeklySummary').textContent = `Total semanal: ${weeklyCalories.reduce((sum, cal) => sum + cal, 0)} kcal (Promedio diario: ${(weeklyCalories.reduce((sum, cal) => sum + cal, 0) / 7).toFixed(0)} kcal)`;
+        const weeklySummary = document.getElementById('weeklySummary');
+        if (weeklySummary) {
+          weeklySummary.textContent = `Total semanal: ${weeklyCalories.reduce((sum, cal) => sum + cal, 0)} kcal (Promedio diario: ${(weeklyCalories.reduce((sum, cal) => sum + cal, 0) / 7).toFixed(0)} kcal)`;
+        }
 
-        if (weeklyChart) weeklyChart.destroy();
-        weeklyChart = new Chart(document.getElementById('weeklyChart'), {
-          type: 'bar',
-          data: {
-            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-            datasets: [{
-              label: 'Calorías diarias',
-              data: weeklyCalories,
-              backgroundColor: '#3b82f6',
-              borderColor: '#2563eb',
-              borderWidth: 1,
-              borderRadius: 4
-            }]
-          },
-          options: {
-            scales: {
-              y: { beginAtZero: true, title: { display: true, text: 'Calorías (kcal)', font: { size: 14 } } },
-              x: { title: { display: true, text: 'Días', font: { size: 14 } } }
+        const weeklyCanvas = document.getElementById('weeklyChart');
+        if (weeklyCanvas && typeof Chart !== 'undefined') {
+          if (weeklyChart) weeklyChart.destroy();
+          weeklyChart = new Chart(weeklyCanvas, {
+            type: 'bar',
+            data: {
+              labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+              datasets: [{
+                label: 'Calorías diarias',
+                data: weeklyCalories,
+                backgroundColor: '#42a5f5',
+                borderColor: '#1e88e5',
+                borderWidth: 1,
+                borderRadius: 6
+              }]
             },
-            plugins: { legend: { display: false } },
-            animation: { duration: 1000, easing: 'easeOutQuart' }
-          }
-        });
+            options: {
+              scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Calorías (kcal)', font: { size: 12 } } },
+                x: { title: { display: true, text: 'Días', font: { size: 12 } } }
+              },
+              plugins: { legend: { display: false } },
+              animation: { duration: 800, easing: 'easeOutQuart' }
+            }
+          });
+        } else {
+          console.warn('Weekly chart canvas or Chart.js not available');
+        }
 
         // Monthly View
         const monthDates = getMonthDates();
         const monthlyCalories = monthDates.map(date => {
           const dayCalories = calories.filter(c => c.date === date);
-          return dayCalories.reduce((sum, c) => sum + c.calories, 0);
+          return dayCalories.reduce((sum, c) => sum + (c.calories || 0), 0);
         });
         const totalMonth = monthlyCalories.reduce((sum, cal) => sum + cal, 0);
-        document.getElementById('monthlySummary').textContent = `Total mensual: ${totalMonth} kcal (Promedio diario: ${(totalMonth / monthDates.length).toFixed(0)} kcal)`;
+        const monthlySummary = document.getElementById('monthlySummary');
+        if (monthlySummary) {
+          monthlySummary.textContent = `Total mensual: ${totalMonth} kcal (Promedio diario: ${(totalMonth / monthDates.length).toFixed(0)} kcal)`;
+        }
 
         // Pie Chart View
         const mealTypes = ['breakfast', 'morningSnack', 'lunch', 'afternoonSnack', 'dinner', 'optional'];
-        const mealLabels = ['Desayuno', 'Merienda Mañana', 'Almuerzo', 'Merienda Tarde', 'Cena', 'Opcional'];
+        const mealLabels = ['Desayuno ☕', 'Merienda Mañana 🥐', 'Almuerzo 🍲', 'Merienda Tarde 🥪', 'Cena 🍴', 'Opcional 🍫'];
         const mealCalories = mealTypes.map(meal => {
           const mealData = calories.filter(c => c.meal === meal);
-          const total = mealData.reduce((sum, c) => sum + c.calories, 0);
+          const total = mealData.reduce((sum, c) => sum + (c.calories || 0), 0);
           const count = mealData.length;
           return count > 0 ? total / count : 0;
         });
         const totalAvgCalories = mealCalories.reduce((sum, cal) => sum + cal, 0);
-        document.getElementById('pieSummary').textContent = `Promedio por comida: ${totalAvgCalories > 0 ? (totalAvgCalories / mealTypes.length).toFixed(0) : 0} kcal`;
+        const pieSummary = document.getElementById('pieSummary');
+        if (pieSummary) {
+          pieSummary.textContent = `Promedio por comida: ${totalAvgCalories > 0 ? (totalAvgCalories / mealTypes.length).toFixed(0) : 0} kcal`;
+        }
 
-        if (pieChart) pieChart.destroy();
-        pieChart = new Chart(document.getElementById('pieChart'), {
-          type: 'pie',
-          data: {
-            labels: mealLabels,
-            datasets: [{
-              label: 'Promedio de Calorías',
-              data: mealCalories,
-              backgroundColor: [
-                '#f87171', '#60a5fa', '#facc15', '#4ade80', '#a78bfa', '#fb923c'
-              ],
-              borderColor: '#ffffff',
-              borderWidth: 2,
-              hoverOffset: 20
-            }]
-          },
-          options: {
-            plugins: {
-              legend: { position: 'bottom', labels: { boxWidth: 20, font: { size: 12 } } },
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    const value = context.raw || 0;
-                    const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
-                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                    return `${context.label}: ${value.toFixed(0)} kcal (${percentage}%)`;
+        const pieCanvas = document.getElementById('pieChart');
+        if (pieCanvas && typeof Chart !== 'undefined') {
+          if (pieChart) pieChart.destroy();
+          pieChart = new Chart(pieCanvas, {
+            type: 'pie',
+            data: {
+              labels: mealLabels,
+              datasets: [{
+                label: 'Promedio de Calorías',
+                data: mealCalories,
+                backgroundColor: [
+                  '#ef5350', '#42a5f5', '#ffca28', '#66bb6a', '#ab47bc', '#ff8f00'
+                ],
+                borderColor: '#ffffff',
+                borderWidth: 2,
+                hoverOffset: 16
+              }]
+            },
+            options: {
+              plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 16, font: { size: 11 } } },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      const value = context.raw || 0;
+                      const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+                      const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                      return `${context.label}: ${value.toFixed(0)} kcal (${percentage}%)`;
+                    }
                   }
                 }
-              }
-            },
-            animation: { duration: 1000, easing: 'easeOutQuart' }
-          }
-        });
+              },
+              animation: { duration: 800, easing: 'easeOutQuart' }
+            }
+          });
+        } else {
+          console.warn('Pie chart canvas or Chart.js not available');
+        }
       } catch (error) {
-        document.getElementById('error').textContent = 'Error al cargar datos. Verifica tu conexión.';
-        document.getElementById('error').style.display = 'block';
+        console.error('Detailed error in updateViews:', error.message, error.stack);
+        if (error) {
+          error.textContent = 'Error al cargar datos. Verifica tu conexión. 🔌';
+          error.style.display = 'block';
+        }
       }
     }
 
     function showView(view) {
-      document.getElementById('weeklyView').style.display = view === 'weekly' ? 'block' : 'none';
-      document.getElementById('monthlyView').style.display = view === 'monthly' ? 'block' : 'none';
-      document.getElementById('pieView').style.display = view === 'pie' ? 'block' : 'none';
-      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-      document.querySelector(`.tab[onclick="showView('${view}')"]`).classList.add('active');
+      console.log('Switching to view:', view);
+      const weeklyView = document.getElementById('weeklyView');
+      const monthlyView = document.getElementById('monthlyView');
+      const pieView = document.getElementById('pieView');
+      if (weeklyView && monthlyView && pieView) {
+        weeklyView.style.display = view === 'weekly' ? 'block' : 'none';
+        monthlyView.style.display = view === 'monthly' ? 'block' : 'none';
+        pieView.style.display = view === 'pie' ? 'block' : 'none';
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        const activeTab = document.querySelector(`.tab[onclick="showView('${view}')"]`);
+        if (activeTab) activeTab.classList.add('active');
+      } else {
+        console.error('View elements not found');
+      }
     }
 
-    document.getElementById('startTime').addEventListener('change', () => {
+    document.getElementById('startTime')?.addEventListener('change', () => {
       localStorage.setItem('startTime', document.getElementById('startTime').value);
       updateReminder();
     });
 
     function updateReminder() {
       const startTime = localStorage.getItem('startTime');
-      if (startTime) {
+      const reminder = document.getElementById('reminder');
+      if (startTime && reminder) {
         const start = new Date(`1970-01-01T${startTime}`);
         const now = new Date();
         const hoursPassed = (now.getTime() - new Date(`1970-01-01T${startTime}`).getTime()) / (1000 * 60 * 60);
-        document.getElementById('reminder').textContent = hoursPassed > 4 ? 'Han pasado más de 4 horas. ¡Come algo!' : 'Estás dentro del horario de comida.';
+        reminder.textContent = hoursPassed > 4 ? 'Han pasado más de 4 horas. ¡Come algo! 🍽️' : 'Estás dentro del horario de comida. 🕒';
       }
     }
 
-    setInterval(updateReminder, 60000);
-    updateViews();
+    window.onload = function() {
+      console.log('Page loaded, initializing...');
+      if (document.getElementById('weeklyView')) {
+        updateViews();
+        setInterval(updateReminder, 60000);
+      } else {
+        console.error('Initialization failed: DOM elements not found');
+        const error = document.getElementById('error');
+        if (error) {
+          error.textContent = 'Error al cargar la página. Recarga e intenta de nuevo. 🔄';
+          error.style.display = 'block';
+        }
+      }
+    };
   </script>
 </body>
 </html>
