@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fitia-Inspired Calorie Tracker 🌿</title>
+  <title>Calorie Tracker 🌿</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css?v=2.2.19" rel="stylesheet" onerror="document.getElementById('fallback-style').innerHTML = 'body { font-family: Arial, sans-serif; background: linear-gradient(to bottom, #d1e7f5, #81d4c3); } .container { max-width: 95%; margin: auto; } .card { background: white; padding: 12px; margin-bottom: 12px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); } .btn-primary { background: linear-gradient(to right, #0d9488, #2563eb); color: white; padding: 10px; border-radius: 12px; } .input-field, select { width: 100%; padding: 10px; border: 2px solid #14b8a6; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); } h1, h2 { font-weight: bold; color: #115e59; text-align: center; }';">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js?v=4.4.4"></script>
   <style id="fallback-style"></style>
@@ -36,10 +36,10 @@
     @media (min-width: 640px) { .error { font-size: 0.875rem; } }
     .tips { background: linear-gradient(to right, #e6f3fa, #a3e4d7); padding: 0.75rem; border-radius: 0.75rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
     @media (min-width: 640px) { .tips { padding: 1rem; } }
-    canvas { max-width: 140px; margin: 0 auto; }
-    @media (min-width: 640px) { canvas { max-width: 180px; } }
-    @media (min-width: 768px) { canvas { max-width: 220px; } }
-    @media (min-width: 1024px) { canvas { max-width: 260px; } }
+    canvas { max-width: 200px; margin: 0 auto; }
+    @media (min-width: 640px) { canvas { max-width: 260px; } }
+    @media (min-width: 768px) { canvas { max-width: 300px; } }
+    @media (min-width: 1024px) { canvas { max-width: 360px; } }
     h1 { font-size: 1.25rem; font-weight: 800; color: #115e59; text-align: center; margin-bottom: 0.75rem; transition: transform 0.3s ease; }
     h1:hover { transform: scale(1.05); }
     @media (min-width: 640px) { h1 { font-size: 1.5rem; } }
@@ -60,7 +60,7 @@
   <div class="debug-info" id="debugInfo">Mobile View</div>
   <div class="container">
     <div class="card">
-      <h1>Tu Camino Saludable 🌿</h1>
+      <h1>The way, routine 🌿</h1>
 
       <div class="mb-4">
         <h2><span class="emoji">⏰</span> Recordatorio</h2>
@@ -226,7 +226,10 @@
           calories = [
             { date: today, meal: 'breakfast', calories: 300 },
             { date: today, meal: 'lunch', calories: 500 },
-            { date: today, meal: 'dinner', calories: 400 }
+            { date: today, meal: 'dinner', calories: 400 },
+            { date: today, meal: 'morningSnack', calories: 150 },
+            { date: today, meal: 'afternoonSnack', calories: 150 },
+            { date: today, meal: 'optional', calories: 100 }
           ];
         }
 
@@ -251,13 +254,14 @@
         const weeklyCanvas = document.getElementById('weeklyChart');
         if (weeklyCanvas && typeof Chart !== 'undefined') {
           if (weeklyChart) weeklyChart.destroy();
+          console.log('Initializing weekly chart with data:', weeklyCalories);
           weeklyChart = new Chart(weeklyCanvas, {
             type: 'bar',
             data: {
               labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
               datasets: [{
                 label: 'Calorías',
-                data: weeklyCalories,
+                data: weeklyCalories.length ? weeklyCalories : [0, 0, 0, 0, 0, 0, 0],
                 backgroundColor: '#4fd1c5',
                 borderColor: '#2c7a7b',
                 borderWidth: 1,
@@ -266,15 +270,15 @@
             },
             options: {
               scales: {
-                y: { beginAtZero: true, title: { display: true, text: 'Calorías', font: { size: 10 } } },
-                x: { title: { display: true, text: 'Días', font: { size: 10 } } }
+                y: { beginAtZero: true, title: { display: true, text: 'Calorías', font: { size: 12 } } },
+                x: { title: { display: true, text: 'Días', font: { size: 12 } } }
               },
               plugins: { legend: { display: false } },
               animation: { duration: 600, easing: 'easeOutQuart' }
             }
           });
         } else {
-          console.warn('Weekly chart canvas or Chart.js not available');
+          console.error('Weekly chart canvas or Chart.js not available:', { canvas: !!weeklyCanvas, chartJs: typeof Chart });
         }
 
         // Monthly View
@@ -297,12 +301,12 @@
         const mealCalories = mealTypes.map(meal => {
           const mealData = calories.filter(c => c.meal === meal && c.calories);
           const total = mealData.reduce((sum, c) => sum + (Number(c.calories) || 0), 0);
-          const count = mealData.length;
-          return count > 0 ? total / count : 0;
+          return mealData.length > 0 ? total / mealData.length : 0;
         });
+        const validMealCalories = mealCalories.every(val => val === 0) ? [100, 50, 150, 50, 100, 25] : mealCalories; // Fallback if all zeros
         const pieSummary = document.getElementById('pieSummary');
         if (pieSummary) {
-          const total = mealCalories.reduce((sum, cal) => sum + cal, 0);
+          const total = validMealCalories.reduce((sum, cal) => sum + cal, 0);
           pieSummary.textContent = `Promedio por comida: ${total > 0 ? (total / mealTypes.length).toFixed(0) : 0} kcal`;
         } else {
           console.warn('Pie summary element not found');
@@ -311,13 +315,14 @@
         const pieCanvas = document.getElementById('pieChart');
         if (pieCanvas && typeof Chart !== 'undefined') {
           if (pieChart) pieChart.destroy();
+          console.log('Initializing pie chart with data:', validMealCalories);
           pieChart = new Chart(pieCanvas, {
             type: 'pie',
             data: {
               labels: mealLabels,
               datasets: [{
                 label: 'Calorías Promedio',
-                data: mealCalories,
+                data: validMealCalories,
                 backgroundColor: ['#f87171', '#4fd1c5', '#fcd34d', '#68d391', '#a78bfa', '#fb923c'],
                 borderColor: '#ffffff',
                 borderWidth: 1,
@@ -326,7 +331,7 @@
             },
             options: {
               plugins: {
-                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } },
+                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } },
                 tooltip: {
                   callbacks: {
                     label: function(context) {
@@ -342,7 +347,9 @@
             }
           });
         } else {
-          console.warn('Pie chart canvas or Chart.js not available');
+          console.error('Pie chart canvas or Chart.js not available:', { canvas: !!pieCanvas, chartJs: typeof Chart });
+          error.textContent = 'Error al cargar el gráfico de distribución. Intenta recargar. 🔄';
+          error.style.display = 'block';
         }
       } catch (err) {
         console.error('Detailed error in updateViews:', err.message, err.stack);
